@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .score-line {
+            display: flex;
+            gap: 5px; /* Adjust spacing if needed */
+            margin-bottom: 10px;
+        }
+        #score {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="score-line">
+        <span id="score">Score: 0</span>
+        <span id="highScore">Record: 0</span>
+    </div>
+    <canvas id="game" width="400" height="400"></canvas>
+
+<script type="module">
+    import init, {Game} from './pkg/snake_game.js';
+    let start = false;
+    let maxScore = 0;
+    async function main() {
+        await init();
+
+        const canvas = document.getElementById('game');
+        const context = canvas.getContext('2d');
+        const game = new Game(40,40);
+        game.draw(context);
+        console.log(game);
+        document.addEventListener('keydown', e => {
+            if(e.key !== 'ArrowUp' && e.key !== 'ArrowDown' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                return;
+            }
+            // console.log(e.key);
+            game.change_direction(e.key);
+            // console.log(game.head_x(), game.head_y(), game.dir_x(), game.dir_y());
+            if (start === false) {
+                start = true;
+                gameLoop();
+            }
+        });
+
+        const gameLoop = () => {
+            game.update();
+            game.draw(context);
+            if (game.is_game_over()) {
+                alert("Game Over!");
+                maxScore = Math.max(maxScore, game.score());
+                document.getElementById('highScore').textContent = 'Record: ' + maxScore;
+                game.restart();
+                game.draw(context);
+                start=false;
+            } else {
+                document.getElementById('score').textContent = 'Score: ' + game.score();
+                setTimeout(gameLoop, 100);
+            }
+        }
+    }
+
+    main();
+</script>
+
+</body>
+</html>
